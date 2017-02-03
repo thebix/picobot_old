@@ -3,3 +3,5 @@ dist/*
 logs
 storage
 lib/token.js
+
+npm-debug.log

@@ -15,8 +15,8 @@ import botToken from './token.js'
 
 
 const isProduction = process.env.NODE_ENV === 'production'
-const token = isProduction ? botToken.prod : botToken.dev
-const bot = new TelegramBot(token, { polling: true })
+// const token = isProduction ? botToken.prod : botToken.dev
+// const bot = new TelegramBot(token, { polling: true })
 
 
 var _state = {
@@ -293,46 +293,46 @@ const stopTimer = (type) => {
     }
 }
 
-const getDateString = (date = new Date()) => {
-    const options = {
-        year: '2-digit', month: 'numeric', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: 'numeric',
-        hour12: false,
-        weekday: "long"
-    }
-    return `${date.toLocaleDateString()} ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
-}
+// const getDateString = (date = new Date()) => {
+//     const options = {
+//         year: '2-digit', month: 'numeric', day: 'numeric',
+//         hour: '2-digit', minute: '2-digit', second: 'numeric',
+//         hour12: false,
+//         weekday: "long"
+//     }
+//     return `${date.toLocaleDateString()} ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`
+// }
 
-const getChangedDateTime = (options = { days: null, hours: null, minutes: null, seconds: null }, date = new Date()) => {
-    let dt = new Date(date)
-    if (options.days != null)
-        dt.setDate(dt.getDate() + options.days)
-    if (options.hours != null)
-        dt.setHours(dt.getHours() + options.hours)
-    if (options.minutes != null)
-        dt.setMinutes(dt.getMinutes() + options.minutes)
-    if (options.seconds != null)
-        dt.setSeconds(dt.getSeconds() + options.seconds)
+// const getChangedDateTime = (options = { days: null, hours: null, minutes: null, seconds: null }, date = new Date()) => {
+//     let dt = new Date(date)
+//     if (options.days != null)
+//         dt.setDate(dt.getDate() + options.days)
+//     if (options.hours != null)
+//         dt.setHours(dt.getHours() + options.hours)
+//     if (options.minutes != null)
+//         dt.setMinutes(dt.getMinutes() + options.minutes)
+//     if (options.seconds != null)
+//         dt.setSeconds(dt.getSeconds() + options.seconds)
 
-    return dt
-}
+//     return dt
+// }
 
-const log = (text, level = logLevel.DEBUG, devChat = false) => {
-    if (!text) return
-    if (_options.log == logLevel.DEBUG
-        || (_options.log == logLevel.INFO && (level == logLevel.INFO || level == logLevel.ERROR))
-        || (_options.log == logLevel.ERROR && level == logLevel.ERROR)) {
-        const t = `${getDateString()} | ${level} | ${text}`
-        console.log(t)
-        if (devChat || _options.duplicateLogToDevChat) {
-            SendMessage(_options.devId, t)
-        }
-    }
-}
+// const log = (text, level = logLevel.DEBUG, devChat = false) => {
+//     if (!text) return
+//     if (_options.log == logLevel.DEBUG
+//         || (_options.log == logLevel.INFO && (level == logLevel.INFO || level == logLevel.ERROR))
+//         || (_options.log == logLevel.ERROR && level == logLevel.ERROR)) {
+//         const t = `${getDateString()} | ${level} | ${text}`
+//         console.log(t)
+//         if (devChat || _options.duplicateLogToDevChat) {
+//             SendMessage(_options.devId, t)
+//         }
+//     }
+// }
 
-const l = (text, devChat = true) => {
-    log(text, logLevel.DEBUG, devChat)
-}
+// const l = (text, devChat = true) => {
+//     log(text, logLevel.DEBUG, devChat)
+// }
 
 const getState = () => {
     return Object.assign({}, _state)

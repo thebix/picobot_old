@@ -1,16 +1,16 @@
 {
   "name": "picobot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Daily pictures",
-  "main": "index.js",
+  "main": "index2.js",
   "private": true,
   "scripts": {
     "test": "mocha --compilers js:babel-register",
 
-    "startDev": "export NODE_ENV=development&& set NODE_ENV=development&& nodemon lib/index.js --exec babel-node",
-    "debug": "nodemon --debug lib/index.js --exec babel-node",
+    "startDev": "export NODE_ENV=development&& set NODE_ENV=development&& nodemon lib/index2.js --exec babel-node",
+    "debug": "nodemon --debug lib/index2.js --exec babel-node",
     "build": "export NODE_ENV=production&& set NODE_ENV=production&& babel lib -d dist",
-    "serve": "export NODE_ENV=production&& set NODE_ENV=production&& node dist/index.js"
+    "serve": "export NODE_ENV=production&& set NODE_ENV=production&& node dist/index2.js"
   },
   "keywords": [
     "telegram",
@@ -22,7 +22,8 @@
     "image-type": "^2.1.0",
     "jsonfile": "^2.4.0",
     "node-telegram-bot-api": "~0.25.0",
-    "read-chunk": "^2.0.0"
+    "read-chunk": "^2.0.0",
+    "redux": "~3.6.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
