@@ -7,7 +7,7 @@
   "scripts": {
     "test": "mocha --compilers js:babel-register",
 
-    "startDev": "export NODE_ENV=development&& set NODE_ENV=development&& nodemon lib/index2.js --exec babel-node",
+    "start": "nodemon lib/index2.js --exec babel-node",
     "debug": "nodemon --debug lib/index2.js --exec babel-node",
     "build": "export NODE_ENV=production&& set NODE_ENV=production&& babel lib -d dist",
     "serve": "export NODE_ENV=production&& set NODE_ENV=production&& node dist/index2.js"

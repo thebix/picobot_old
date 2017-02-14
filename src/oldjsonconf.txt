@@ -1,0 +1,14 @@
+{
+    "typeAcquisition": { "include": [ "node-telegram-bot-api" ] },
+    "exclude": [
+        "dist",
+        "res",
+        "test",
+        "storage"
+    ],
+    "compilerOptions": {
+        "target": "ES6",
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true
+    }
+}

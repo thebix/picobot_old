@@ -1,11 +1,11 @@
 import { l, log } from './loggers'
-import { /*fileTypes,*/ logLevel, timerType /*, botCommands, chatTypes*/ } from './enums.js'
+import { logLevel, timerTypes } from './enums.js'
 import _options from './options'
 
 export default class Timer {
     constructor(type, callback) {
-        if (!type || type === timerType.NONE) {
-            log(`В конструктор таймера не передан тип. timerType = ${type}`, logLevel.ERROR)
+        if (!type || type === timerTypes.NONE) {
+            log(`В конструктор таймера не передан тип. timerTypes = ${type}`, logLevel.ERROR)
             return
         }
         if (!callback || typeof callback !== 'function') {
@@ -21,34 +21,26 @@ export default class Timer {
         this.isStopped = true //Состояние таймера - выключен 
     }
     onCheckDateTime() {
-        if(this.isStopped)
+        if (this.isStopped)
             return
-        // l(`Timer onCheckDateTime`)
         const dt = new Date()
-        // l("dt", dt)
-        // l('this.dateTime', this.dateTime)
         if (!this.dateTime || dt < this.dateTime) {
-            // l(`Timer onCheckDateTime IF - рано для срабатывания`)
-            //clearInterval(this.timerId)
+            if (this.timerId)
+                clearInterval(this.timerId)
             this.timerId = setTimeout(this.onCheckDateTime, _options.intervalMain * 1000 * 60)
             this.isStopped = false
             return
         }
         this.isStopped = true
-        // l(`Timer onCheckDateTime вызов callback`)
-        this.callback()
+        this.callback(this.type)
     }
     onTrigger() {
-        if(this.isStopped)
+        if (this.isStopped)
             return
-        l(`Timer onTrigger`)
         this.isStopped = true
-        this.callback()
+        this.callback(this.type)
     }
     start({interval, dateTime}) {
-        // l(`Timer start`)
-        // l(`interval`, interval)
-        // l(`dateTime`, dateTime)
         if (interval) {
             let callback = this.callback
             this.isStopped = false
@@ -57,14 +49,11 @@ export default class Timer {
             this.dateTime = dateTime
             this.isStopped = false
             this.timerId = setTimeout(this.onCheckDateTime, _options.intervalMain * 1000 * 60)
-            //console.log(this.timerId)
         }
     }
     stop() {
-        //l(`Timer stop`)
         this.isStopped = true
-        //l(`this.timerId`, this.timerId)
-        if(this.timerId)
+        if (this.timerId)
             clearInterval(this.timerId)
     }
 } 

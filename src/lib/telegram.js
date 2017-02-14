@@ -14,6 +14,7 @@ class Telegram extends MessangerBase {
         const t = token ? token : isProduction ? botToken.prod : botToken.dev
         this.bot = new TelegramBot(t, { polling: true })
         this.sendMessage = this.sendMessage.bind(this)
+ 
     }
     sendMessage({text, img, chatId}){
         //super.sendMessage(text)

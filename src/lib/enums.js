@@ -9,11 +9,11 @@ export const logLevel = {
     DEBUG: "DEBUG"
 }
 
-export const timerType = {
-    NONE: "Не задан",
-    MAIN: "main",   //"Главный короткий (мин)",
-    DAILY: "daily", //Ежедневного отображения картинки (мин)",
-    DAILY_SET: "dail_set", //Ежедневной установки времени таймера ежедневной картинки"
+export const timerTypes = {
+    NONE: "NONE",
+    MAIN: "MAIN",   //"Главный короткий (мин)",
+    DAILY: "DAILY", //Ежедневного отображения картинки (мин)",
+    DAILY_SET: "DAILY_SET", //Ежедневной установки времени таймера ежедневной картинки"
 }
 
 export const botCommands = {
@@ -30,4 +30,9 @@ export const botCommands = {
 export const chatTypes = {
     PRIVATE: 'private',
     GROUP: 'group'
+}
+
+export const messangerTypes = {
+    telegram: 'telegram',
+    irc: 'irc'
 }

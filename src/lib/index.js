@@ -4,7 +4,7 @@ import TelegramBot from 'node-telegram-bot-api'
 
 import Cleanup from './cleanup'
 import _options from './options.js'
-import { fileTypes, logLevel, timerType, botCommands, chatTypes } from './enums.js'
+import { fileTypes, logLevel, timerTypes, botCommands, chatTypes } from './enums.js'
 
 import fs from 'fs'
 import readChunk from 'read-chunk'
@@ -30,7 +30,7 @@ const Run = () => {
     log(helloText, logLevel.INFO, true)
 
     if (_options.autostart) {
-        startTimer(timerType.MAIN)
+        startTimer(timerTypes.MAIN)
     }
 
     const regxParams = new RegExp(`^\/${_options.botCmd} ([a-zA-Z0-9а-яА-Я]+)\s*(.+)*$`)
@@ -74,7 +74,7 @@ const mainInterval = () => {
     if (!!state.dailyPicShowDateTime && dt > state.dailyPicShowDateTime) {
         // l('IF 1')
         Post(null)
-        stopTimer(timerType.DAILY)
+        stopTimer(timerTypes.DAILY)
     }
     // l(`state.dailySetDateTime= __${state.dailySetDateTime}__`)
     // l(`!state.dailySetDateTime || dt > state.dailySetDateTime= __${!state.dailySetDateTime || dt > state.dailySetDateTime}__`)
@@ -82,9 +82,9 @@ const mainInterval = () => {
     if (!state.dailySetDateTime || dt > state.dailySetDateTime) {
         // l('IF 2')
         //установиь время установки времени следующего отображения картинки
-        startTimer(timerType.DAILY_SET)
+        startTimer(timerTypes.DAILY_SET)
         //запустить таймер отображения картинки
-        startTimer(timerType.DAILY)
+        startTimer(timerTypes.DAILY)
     }
 }
 
@@ -236,22 +236,22 @@ const MoveToArchive = (image) => {
 
 const Dispose = () => {
     log("Dispose(). Освобождение ресурсов.", logLevel.INFO)
-    Object.keys(timerType).forEach(x => {
+    Object.keys(timerTypes).forEach(x => {
         stopTimer(x)
     })
 }
 
-const startTimer = (type = timerType.MAIN, options = { interval: null, dateTime: null }) => {
+const startTimer = (type = timerTypes.MAIN, options = { interval: null, dateTime: null }) => {
     stopTimer(type)
     let interval = 0;
     let intervalId = null
     let date = options.dateTime || new Date()
     switch (type) {
-        case timerType.MAIN:
+        case timerTypes.MAIN:
             interval = options.interval || _options.intervalMain
             intervalId = _state.intervalMain = setInterval(mainInterval, interval * 60 * 1000)
             break;
-        case timerType.DAILY:
+        case timerTypes.DAILY:
             if (!options.dateTime) {
                 interval = options.interval || ((Math.random() * (_options.intervalDaily.max - _options.intervalDaily.min)
                     + _options.intervalDaily.min) | 0)
@@ -260,7 +260,7 @@ const startTimer = (type = timerType.MAIN, options = { interval: null, dateTime:
             date = getChangedDateTime({ minutes: interval }, date)
             saveState({ dailyPicShowDateTime: date })
             break
-        case timerType.DAILY_SET:
+        case timerTypes.DAILY_SET:
             if (!options.dateTime) {
                 interval = options.interval || _options.intervalDaily.max
             }
@@ -275,14 +275,14 @@ const startTimer = (type = timerType.MAIN, options = { interval: null, dateTime:
 const stopTimer = (type) => {
     let timerId = null
     switch (type) {
-        case timerType.MAIN:
+        case timerTypes.MAIN:
             timerId = _state.intervalMain
             _state.intervalMain = null
             break
-        case timerType.DAILY:
+        case timerTypes.DAILY:
             saveState({ dailyPicShowDateTime: null })
             break
-        case timerType.DAILY_SET:
+        case timerTypes.DAILY_SET:
             saveState({ dailySetDateTime: null })
             break
     }
@@ -537,13 +537,13 @@ const proceedCommand = (msg, match) => {
             case botCommands.GOBOT:
                 if (!isDevChat)
                     return;
-                startTimer(timerType.MAIN)
+                startTimer(timerTypes.MAIN)
                 return
                 break
             case botCommands.STOPBOT:
                 if (!isDevChat)
                     return;
-                stopTimer(timerType.MAIN)
+                stopTimer(timerTypes.MAIN)
                 return
                 break
             case botCommands.PIC:

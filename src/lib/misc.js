@@ -4,15 +4,15 @@ import { l } from './loggers'
 // Клонирование, копирование данных
 export const cloneArray = (array = []) => {
     const res = []
-    array.forEach((element) => {
-        //console.log(typeof(element))
-        if(typeof(element) === 'object'){
-            res.push(Object.assign({}, element))
-        } else {
-            res.push(element)
-        }
-    });
-    // console.log(res)
+    if (array && array.length > 0) {
+        array.forEach((element) => {
+            if (typeof (element) === 'object') {
+                res.push(Object.assign({}, element))
+            } else {
+                res.push(element)
+            }
+        });
+    }
     return res
 }
 
