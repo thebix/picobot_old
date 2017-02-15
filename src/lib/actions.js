@@ -1,6 +1,10 @@
-import { timerTypes } from './enums.js'
-
+import { 
+    timerTypes,
+    botCommandTypes,
+    messangerTypes
+} from './enums.js'
 import { l } from './loggers'
+import _options from './options'
 
 /******************
  *  ТИПЫ ДЕЙСТВИЙ *
@@ -17,12 +21,16 @@ export const ACT_TIMER_START = "TIMER_START"
 export const ACT_TIMER_STARTED = "TIMER_STARTED"
 export const ACT_TIMER_STOP = "TIMER_STOP"
 export const ACT_TIMER_STOPPED = "TIMER_STOPED"
+//управление ботом
+export const ACT_BOT_CMD = "ACT_BOT_CMD" //команда или обращение к боту
+export const ACT_BOT_CMD_DONE = "ACT_BOT_CMD_DONE" //команда или обращение к боту обработаны
 
+ 
 /***************
  *  ГЕНЕРАТОРЫ *
  ***************/
 // чаты
-export const chatActiveToggle = (messangerType, id,  status = null) => {
+export const chatActiveToggle = (id, status = null, messangerType = messangerTypes.telegram) => {
     return {
         type: ACT_CHAT_ACTIVE_TOGGLE,
         id,
@@ -31,7 +39,7 @@ export const chatActiveToggle = (messangerType, id,  status = null) => {
     }
 }
 
-export const chatAdd = (messangerType, id, title, dir = null) => {
+export const chatAdd = (id, title, dir = null, messangerType = messangerTypes.telegram) => {
     return {
         type: ACT_CHAT_ADD,
         id,
@@ -42,7 +50,7 @@ export const chatAdd = (messangerType, id, title, dir = null) => {
 }
 
 //если передан null или undefined - настройка не перезаписывается
-export const chatUpdate = (messangerType, id, title = null, dir = null, wordPics = null) => {
+export const chatUpdate = (id, title = null, dir = null, wordPics = null, messangerType = messangerTypes.telegram) => {
     return {
         type: ACT_CHAT_UPDATE,
         id,
@@ -53,7 +61,7 @@ export const chatUpdate = (messangerType, id, title = null, dir = null, wordPics
     }
 }
 
-export const chatRemove = (messangerType, id) => {
+export const chatRemove = (id, messangerType = messangerTypes.telegram) => {
     return {
         type: ACT_CHAT_REMOVE,
         id,
@@ -102,5 +110,40 @@ export const timerStopped = (timerType = timerTypes.NONE) => {
     return {
         type: ACT_TIMER_STOPPED,
         timerType
+    }
+}
+
+
+// команды бота
+// fromId - идентификатор того, кто прислал команду
+// chatId - идентификатор чата, в котором пришла команда
+// cmd - команда
+// params - параметры команды
+// messangerType - мессенджер в котором поступила команда
+export const botCommand = (fromId, chatId, cmd, params, messangerType = messangerTypes.telegram) => {
+    const superUserIds = _options.superUserIds[messangerType]
+    const superChatIds = _options.superChatIds[messangerType]
+    //сообщение от админа бота?
+    const isSuperUser = superUserIds && superUserIds.length > 0
+        ? superUserIds.indexOf(fromId) != -1 : false
+    //сообщение в админский приват чат?
+    const isSuperChat = superChatIds && superChatIds.length > 0
+        ? superChatIds.indexOf(fromId) != -1 : false
+    
+    return {
+        type: ACT_BOT_CMD,
+        fromId,
+        chatId,
+        cmd,
+        params,
+        messangerType,
+        isSuperUser,
+        isSuperChat
+    }
+}
+
+export const botCommandDone = () => {
+    return {
+        type: ACT_BOT_CMD_DONE
     }
 }

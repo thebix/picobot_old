@@ -16,7 +16,7 @@ export const timerTypes = {
     DAILY_SET: "DAILY_SET", //Ежедневной установки времени таймера ежедневной картинки"
 }
 
-export const botCommands = {
+export const botCommandTypes = {
     PIC: 'pic',
     GO: 'go',
     STOP: 'stop',

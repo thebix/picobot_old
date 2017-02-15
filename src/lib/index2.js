@@ -9,20 +9,24 @@ import _options from './options.js'
 import { getChangedDateTime } from './misc'
 
 import {
+    chatActiveToggle,
     chatAdd,
     chatUpdate,
     chatRemove,
+
     timerStart,
     timerStarted,
     timerStop,
     timerStopped,
-    chatActiveToggle
+
+    botCommand,
+    botCommandDone
 } from './actions'
 
-import { /*fileTypes,*/ 
-    logLevel, 
+import { /*fileTypes,*/
+    logLevel,
     timerTypes,
-    messangerTypes /*, botCommands, chatTypes*/ 
+    messangerTypes /*, botCommands, chatTypes*/
 } from './enums.js'
 
 // import fs from 'fs'
@@ -84,18 +88,25 @@ const Run = () => {
     //store.dispatch(timerStart(timerTypes.MAIN, null, 10))
 
     // Работа с активными чатами
-    // store.dispatch(chatActiveToggle(messangerTypes.telegram, "TELEG 666", false))
-    // store.dispatch(chatActiveToggle(messangerTypes.telegram, "TELEG 777", true))
-    // store.dispatch(chatActiveToggle(messangerTypes.telegram, "TELEG 888"))
-    // store.dispatch(chatActiveToggle(messangerTypes.irc, "IRC ID"))
-    // store.dispatch(chatActiveToggle(messangerTypes.telegram, "TELEG 888"))
+    // store.dispatch(chatActiveToggle("TELEG 666", false))
+    // store.dispatch(chatActiveToggle("TELEG 777", true))
+    // store.dispatch(chatActiveToggle("TELEG 888"))
+    // store.dispatch(chatActiveToggle("IRC ID", null, messangerTypes.irc))
+    // store.dispatch(chatActiveToggle("TELEG 888"))
 
     // Работа с чатами
-    // store.dispatch(chatAdd(messangerTypes.telegram, "TELEG 666", "Тайтл чата TELEG 666", "Директория чата TELEG 666"))
-    // store.dispatch(chatAdd(messangerTypes.irc, "IRC 777", "Тайтл чата IRC 777", "Директория чата IRC 777"))
-    // store.dispatch(chatUpdate(messangerTypes.telegram,  "TELEG 666", null, "23"))
-    // store.dispatch(chatRemove(messangerTypes.telegram,  "TELEG 666"))
-    
+    // store.dispatch(chatAdd("TELEG 666", "Тайтл чата TELEG 666", "Директория чата TELEG 666"))
+    // store.dispatch(chatAdd("IRC 777", "Тайтл чата IRC 777", "Директория чата IRC 777", messangerTypes.irc))
+    // store.dispatch(chatUpdate("TELEG 666", null, "23"))
+    // store.dispatch(chatRemove("TELEG 666"))
+
+    // команды боту
+    // store.dispatch(botCommand(84677480, 84677480, "go1", "some params1"))
+    // store.dispatch(botCommand(123, 84677480, "go2", "some params2"))
+    // store.dispatch(botCommand(666, 888, "go3", "some params3"))
+
+
+
     // Прекратим слушать обновление состояния
     // unsubscribe()
 
@@ -145,24 +156,27 @@ const initState = () => {
 //Реакция на изменение состояния
 const processState = () => {
     const state = store.getState()
-    l(state.chats)
-    
+    l(state.botCommand)
+
     // Tаймеры
     if (state.timers && state.timers.timers) {
         for (let timerType in state.timers.timers) {
             const timer = state.timers.timers[timerType]
             const timerState = state.timers.states[timerType]
-            //l(`processState: timer '${timerType}' state`, timerState)
             if (timerState.isStarting) {
-                //l(`processState: timer '${timerType}' is starting`)
                 timer.start({ interval: timerState.interval, date: timerState.dateTime })
                 store.dispatch(timerStarted(timerType))
             } else if (timerState.isStopping) {
-                //l(`processState: timer '${timerType}' is stopping`)
                 timer.stop()
                 store.dispatch(timerStopped(timerType))
             }
         }
+    }
+
+    // Команды боту
+    if (state.botCommand && state.botCommand.cmd) {
+        store.dispatch(botCommandDone()) //сначала очищаем команду, т.к. она уже поступила в обработку
+        onBotCommand(state.botCommand)
     }
 }
 
@@ -171,6 +185,11 @@ const onTimerTrigger = (type) => {
     store.dispatch(timerStop(type))
     l(`Триггер таймера ${type}`)
     //store.dispatch(timerStart(type, null, 5)) //INFO: чтобы таймер продолжал работать дальше. Актуально для MAIN
+}
+
+// Обработка команды боту
+const onBotCommand = (command) => {
+    //TODO: обоработка команд бота
 }
 
 

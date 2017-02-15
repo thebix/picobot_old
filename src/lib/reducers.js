@@ -14,6 +14,9 @@ import {
     ACT_TIMER_STARTED,
     ACT_TIMER_STOP,
     ACT_TIMER_STOPPED,
+
+    ACT_BOT_CMD,
+    ACT_BOT_CMD_DONE
 } from './actions.js'
 
 export const stateSkeleton = {
@@ -55,6 +58,27 @@ export const stateSkeleton = {
                 date: null
             }
         },
+    },
+    botCommand: {
+        cmd: null,
+        params: null,
+        fromId: null,
+        chatId: null,
+        messangerType: null,
+        isSuperUser: false,
+        isSuperChat: false
+    },
+    botMessage: {
+        chatIds: {
+            telegram: []
+        },
+        excludeChatIds: {
+            telegram: []
+        },
+        inResponseId: null,
+        text: null,
+        image: null,
+        file: null
     }
 }
 
@@ -83,7 +107,7 @@ const chatsActive = (state = stateSkeleton.chatsActive, action) => {
                     chatsArr.splice(i, 1)
                 }
                 newState[action.messangerType] = chatsArr
-                return  newState
+                return newState
             }
             break
         default:
@@ -95,8 +119,8 @@ const chatsActive = (state = stateSkeleton.chatsActive, action) => {
 // Настройки чатов (как активных, в которых рассылка, так и простых, где бот просто отвечает)
 const chats = (state = stateSkeleton.chats, action) => {
     const newState = Object.assign({}, state)
-    switch(action.type) {
-        case ACT_CHAT_ADD: { 
+    switch (action.type) {
+        case ACT_CHAT_ADD: {
             const messanger = newState[action.messangerType] || {}
             const chat = messanger[action.id] || {}
             chat.id = action.id
@@ -111,18 +135,18 @@ const chats = (state = stateSkeleton.chats, action) => {
             const messanger = newState[action.messangerType] || {}
             const chat = messanger[action.id] || {}
             chat.id = action.id
-            if(action.title || action.title === "") chat.title = action.title
-            if(action.dir || action.dir === "") chat.dir = action.dir
-            if(action.wordPics) chat.wordPics = action.wordPics
+            if (action.title || action.title === "") chat.title = action.title
+            if (action.dir || action.dir === "") chat.dir = action.dir
+            if (action.wordPics) chat.wordPics = action.wordPics
             messanger[action.id] = chat
             newState[action.messangerType] = messanger
             return newState
         }
         case ACT_CHAT_REMOVE: {
             const messanger = newState[action.messangerType]
-            if(!messanger) break
+            if (!messanger) break
             const chat = messanger[action.id]
-            if(!chat) break
+            if (!chat) break
             delete messanger[action.id]
             newState[action.messangerType] = messanger
             return newState
@@ -174,10 +198,38 @@ const timers = (state = stateSkeleton.timers, action) => {
     return state
 }
 
+const botCommand = (state = stateSkeleton.botCommand, action) => {
+    const newState = Object.assign({}, state)
+    switch (action.type) {
+        case ACT_BOT_CMD:
+            newState.fromId = action.fromId
+            newState.chatId = action.chatId
+            newState.cmd = action.cmd
+            newState.params = action.params
+            newState.messangerType = action.messangerType
+            newState.isSuperUser = action.isSuperUser
+            newState.isSuperChat = action.isSuperChat
+            return newState
+        case ACT_BOT_CMD_DONE:
+            newState.fromId = null
+            newState.chatId = null
+            newState.cmd = null
+            newState.params = null
+            newState.messangerType = null
+            newState.isSuperUser = false
+            newState.isSuperChat = false
+            return newState
+        default:
+            break;
+    }
+    return state
+}
+
 export default (state = stateSkeleton, action) => {
     return {
         chatsActive: chatsActive(state.chatsActive, action),
         chats: chats(state.chats, action),
-        timers: timers(state.timers, action)
+        timers: timers(state.timers, action),
+        botCommand: botCommand(state.botCommand, action)
     }
 }

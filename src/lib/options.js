@@ -9,7 +9,14 @@ export default
         version: "v.0.2.0",
 
         log: isProduction ? logLevel.INFO : logLevel.DEBUG,
-        devId: 84677480,
+        // идентификаторы админов бота
+        superUserIds: {
+            telegram: [84677480],
+        },
+        // идентификаторы прайват-чатов по управлению ботом
+        superChatIds: {
+            telegram: [84677480],
+        },
         //dailyPicShowDateTime: new Date(), //дата, после которой показать картинку в след раз
         duplicateLogToDevChat: !isProduction, //принудительно дублировать вообще все логи в дев чат
 
