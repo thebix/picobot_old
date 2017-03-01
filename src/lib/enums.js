@@ -1,6 +1,6 @@
 export const fileTypes = {
-    Gif: "gif",
-    Jpg: "jpg"
+    image: "image",
+    file: "file"
 }
 
 export const logLevel = {
@@ -24,7 +24,8 @@ export const botCommandTypes = {
     STOPBOT: 'stopbot',
     ANS: "ans",
     MSG: 'msg',
-    PICDIR: 'picdir' 
+    PICDIR: 'picdir',
+    HELP: 'help'
 }
 
 export const chatTypes = {
@@ -35,4 +36,11 @@ export const chatTypes = {
 export const messangerTypes = {
     telegram: 'telegram',
     irc: 'irc'
+}
+
+export const errorMessageSendTypes = {
+    noChats: "noChats",
+    noMessangers: 'noMessangers',
+    noData: 'noData',
+    sendError: 'sendError'
 }

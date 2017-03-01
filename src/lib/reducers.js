@@ -15,8 +15,13 @@ import {
     ACT_TIMER_STOP,
     ACT_TIMER_STOPPED,
 
+    ACT_MESSANGER_ADD,
+
     ACT_BOT_CMD,
-    ACT_BOT_CMD_DONE
+    ACT_BOT_CMD_DONE,
+
+    ACT_MESSAGE_SEND,
+    ACT_MESSAGE_SEND_DONE
 } from './actions.js'
 
 export const stateSkeleton = {
@@ -35,8 +40,7 @@ export const stateSkeleton = {
         }
     },
     messangers: {
-        "telegram": {
-        }
+
     },
     timers: {
         timers: {
@@ -68,7 +72,7 @@ export const stateSkeleton = {
         isSuperUser: false,
         isSuperChat: false
     },
-    botMessage: {
+    message: {
         chatIds: {
             telegram: []
         },
@@ -77,7 +81,6 @@ export const stateSkeleton = {
         },
         inResponseId: null,
         text: null,
-        image: null,
         file: null
     }
 }
@@ -198,6 +201,23 @@ const timers = (state = stateSkeleton.timers, action) => {
     return state
 }
 
+const messangers = (state = stateSkeleton.messangers, action) => {
+    const newState = Object.assign({}, state)
+    switch (action.type) {
+        case ACT_MESSANGER_ADD:
+            if (!newState[action.messangerType])
+                newState[action.messangerType] = action.messanger
+            return newState
+        // case ACT_MESSANGER_ADD_DONE:
+
+        //     return newState
+        default:
+            break;
+    }
+    return state
+}
+
+// команда боту
 const botCommand = (state = stateSkeleton.botCommand, action) => {
     const newState = Object.assign({}, state)
     switch (action.type) {
@@ -225,11 +245,40 @@ const botCommand = (state = stateSkeleton.botCommand, action) => {
     return state
 }
 
+// отправка сообщения
+const message = (state = stateSkeleton.message, action) => {
+    //l("message reducer. action", action)
+    const newState = Object.assign({}, state)
+    switch (action.type) {
+        case ACT_MESSAGE_SEND:
+            newState.chatIds = action.chatIds
+            newState.excludeChatIds = action.excludeChatIds
+            newState.inResponseId = action.inResponseId
+            newState.text = action.text
+            newState.image = action.image
+            newState.file = action.file
+            return newState
+        case ACT_MESSAGE_SEND_DONE:
+            newState.chatIds = null
+            newState.excludeChatIds = null
+            newState.inResponseId = null
+            newState.text = null
+            newState.image = null
+            newState.file = null
+            return newState
+        default:
+            break;
+    }
+    return state
+}
+
 export default (state = stateSkeleton, action) => {
     return {
         chatsActive: chatsActive(state.chatsActive, action),
         chats: chats(state.chats, action),
         timers: timers(state.timers, action),
-        botCommand: botCommand(state.botCommand, action)
+        messangers: messangers(state.messangers, action),
+        botCommand: botCommand(state.botCommand, action),
+        message: message(state.message, action)
     }
 }

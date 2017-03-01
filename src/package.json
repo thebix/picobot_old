@@ -23,7 +23,8 @@
     "jsonfile": "^2.4.0",
     "node-telegram-bot-api": "~0.25.0",
     "read-chunk": "^2.0.0",
-    "redux": "~3.6.0"
+    "redux": "~3.6.0",
+    "redux-thunk": "~2.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",

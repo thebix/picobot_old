@@ -1,5 +1,7 @@
 
-import { createStore } from 'redux'
+import {createStore, compose, applyMiddleware} from 'redux'
+import thunkMiddleware from 'redux-thunk'
+
 import botReducer, { stateSkeleton } from './reducers'
 import Telegram from './telegram'
 import Timer from './timer'
@@ -19,8 +21,13 @@ import {
     timerStop,
     timerStopped,
 
+    messangerAdd,
+
     botCommand,
-    botCommandDone
+    botCommandDone,
+
+    messageSend,
+    messageSendDone
 } from './actions'
 
 import { /*fileTypes,*/
@@ -42,31 +49,17 @@ const Run = () => {
     const cleanup = new Cleanup(Dispose);
 
     //subscribe() возвращает функцию для отмены регистрации слушателя
-    let unsubscribe = store.subscribe(() =>
-        processState()
-    )
+    let unsubscribe = store.subscribe(() =>processState())
 
-    //initState()
-
-    // const callbk = () => {
-    //     l('callback вызван')
-    // }
-
-    //l("callbk", callbk)
-    // const timer_err1 = new Timer()
-    // const timer_err2 = new Timer(timerTypes.DAILY)
     l("test beg")
-    //processState()
-    //
-    // const timer = new Timer(timerTypes.DAILY, callbk)
-    // timer.start({ interval: 10 })
-    // // timer.stop()
-    // let dt = new Date()
-    // dt = getChangedDateTime({ seconds: 34 }, dt)
-    //  timer.start({ dateTime: dt })
-    //  timer.stop()
 
+    // #region Инициализация
 
+    // мессенджеры
+    const botTelegram = new Telegram({dispatch: store.dispatch})
+    store.dispatch(messangerAdd(messangerTypes.telegram, botTelegram))
+    // #endregion Инициализация
+    
     // OLD
     const helloText = `\n\n*******************\n* Бот ${_options.version} запущен\n*******************\nРежим = ${isProduction ? "production" : "dev"}`
 
@@ -105,21 +98,13 @@ const Run = () => {
     // store.dispatch(botCommand(123, 84677480, "go2", "some params2"))
     // store.dispatch(botCommand(666, 888, "go3", "some params3"))
 
-
+    // отправка сообщений ботами
+    store.dispatch(messageSend({telegram: [84677480]}, "Некоторый тестовый текст"))
 
     // Прекратим слушать обновление состояния
     // unsubscribe()
 
-    //var telegram = new Telegram({ token: null })
-    //telegram.sendMessage("text send message")
 
-
-
-    //store.dispatch(timerStart(timerTypes.MAIN, null, 10))
-    // setTimeout(() => {
-    //     l('Trigger timer stop')
-    //     store.dispatch(timerStop(timerTypes.MAIN))
-    // }, 12000)
 }
 
 
@@ -155,8 +140,9 @@ const initState = () => {
 
 //Реакция на изменение состояния
 const processState = () => {
+    
     const state = store.getState()
-    l(state.botCommand)
+    //l(state.message) 
 
     // Tаймеры
     if (state.timers && state.timers.timers) {
@@ -175,25 +161,57 @@ const processState = () => {
 
     // Команды боту
     if (state.botCommand && state.botCommand.cmd) {
-        store.dispatch(botCommandDone()) //сначала очищаем команду, т.к. она уже поступила в обработку
         onBotCommand(state.botCommand)
     }
+
+    // Сообщения через ботов
+    // if (state.message && state.message.chatIds && Object.keys(state.message.chatIds).length > 0) {
+    //     onMessageSend(state.message, state.messangers)
+    // }
 }
 
 // Колбэк таймеров
 const onTimerTrigger = (type) => {
     store.dispatch(timerStop(type))
     l(`Триггер таймера ${type}`)
-    //store.dispatch(timerStart(type, null, 5)) //INFO: чтобы таймер продолжал работать дальше. Актуально для MAIN
+    //store.dispatch(timerStart(type, null, 10)) //INFO: чтобы таймер продолжал работать дальше. Актуально для MAIN
 }
 
 // Обработка команды боту
 const onBotCommand = (command) => {
+    l("onBotCommand", command)
+    store.dispatch(botCommandDone()) //сначала очищаем команду, т.к. она уже поступила в обработку
     //TODO: обоработка команд бота
+    //получение дополнительных параметров
+    
 }
 
+// TODO: отправку сообщения сделать через промисы и миддлвэр в экшнах/редусерах
+// Сообщение в ботов
+const onMessageSend = (message, messangers) => {
+    l("onMessageSend", message)
+    //l("messangers", messangers)
+    store.dispatch(messageSendDone()) //сначала очищаем команду, т.к. она уже поступила в обработку
+    if(!message || !message.chatIds || Object.keys(message.chatIds).length === 0) return
+    const prms = []
+    Object.keys(message.chatIds).forEach((messangerTitle) => {
+        l("messangerTitle", messangerTitle)
+        const messanger = messangers[messangerTitle]
+        //l("messanger", messanger)
+        if(!messanger)
+            return
+        const chatIds = message.chatIds[messangerTitle]
+        prms.push(messanger.sendMessage(chatIds, {text: message.text, file: message.file}))
+    })
+    if(prms.length === 0)
+        return
+    Promise.all(prms).then((data) => { l("onMessageSend Promise.all THEN. data = ", data) }).catch((err) => {  l("onMessageSend Promise.all ERROR. err = ", err) })
+}
 
-let store = createStore(botReducer, initState())
+const enhancer = compose(
+    applyMiddleware(thunkMiddleware)
+);
+let store = createStore(botReducer, initState(), enhancer)
 let unsubscribe
 const isProduction = process.env.NODE_ENV === 'production'
 if (_options.run) Run()
